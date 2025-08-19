@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+
+interface Option { id: string; name: string; type?: string }
 
 export default function NewTransactionPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<Option[]>([]);
+  const [categories, setCategories] = useState<Option[]>([]);
   
   const [formData, setFormData] = useState({
     type: 'EXPENSE',
@@ -20,6 +24,24 @@ export default function NewTransactionPage() {
     paymentMethod: 'DEBIT',
     installmentsTotal: '',
   });
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [accRes, catRes] = await Promise.all([
+          fetch('/api/meta/accounts'),
+          fetch('/api/meta/categories'),
+        ]);
+        const acc = await accRes.json();
+        const cat = await catRes.json();
+        setAccounts(acc.accounts || []);
+        setCategories(cat.categories || []);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -126,8 +148,9 @@ export default function NewTransactionPage() {
               className="w-full mt-1 border rounded-md px-3 py-2 bg-background"
             >
               <option value="">Selecione uma conta</option>
-              <option value="account1">Conta Principal</option>
-              <option value="account2">Cartão Nubank</option>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -138,9 +161,9 @@ export default function NewTransactionPage() {
               className="w-full mt-1 border rounded-md px-3 py-2 bg-background"
             >
               <option value="">Sem categoria</option>
-              <option value="category1">Alimentação</option>
-              <option value="category2">Transporte</option>
-              <option value="category3">Moradia</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -166,7 +189,7 @@ export default function NewTransactionPage() {
             <input
               type="number"
               min="1"
-              max="12"
+              max="24"
               value={formData.installmentsTotal}
               onChange={(e) => setFormData({ ...formData, installmentsTotal: e.target.value })}
               className="w-full mt-1 border rounded-md px-3 py-2 bg-background"

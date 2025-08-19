@@ -2,6 +2,7 @@ import { requireAuth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+// TODO: Integrate Recharts with Server Components via Client components wrappers
 
 export default async function DashboardPage() {
   const session = await requireAuth();
