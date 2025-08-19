@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id           String   @id @default(cuid())
+  name         String
+  inviteCode   String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  users        User[]
+  accounts     Account[]
+  categories   Category[]
+  budgets      Budget[]
+  goals        Goal[]
+  transactions Transaction[]
+}
+
+enum UserRole {
+  OWNER
+  INVITED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  role         UserRole
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  familyId     String
+  family       Family    @relation(fields: [familyId], references: [id])
+  transactions Transaction[]
+}
+
+model Account {
+  id           String   @id @default(cuid())
+  name         String
+  type         String   // bank, cash, credit_card
+  balance      Decimal  @default(0)
+  dueDay       Int?     // for credit card billing
+  familyId     String
+  family       Family   @relation(fields: [familyId], references: [id])
+  transactions Transaction[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  kind      String   // income or expense
+  familyId  String
+  family    Family   @relation(fields: [familyId], references: [id])
+  budgets   Budget[]
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  date          DateTime
+  amount        Decimal
+  type          String   // income or expense
+  description   String?
+  accountId     String
+  account       Account  @relation(fields: [accountId], references: [id])
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  familyId      String
+  family        Family   @relation(fields: [familyId], references: [id])
+  paymentMethod String?  // cash, debit, credit
+  installments  Int?     // number of installments when credit
+  createdAt     DateTime @default(now())
+}
+
+model Budget {
+  id           String   @id @default(cuid())
+  name         String
+  limit        Decimal
+  periodStart  DateTime
+  periodEnd    DateTime
+  familyId     String
+  family       Family   @relation(fields: [familyId], references: [id])
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Goal {
+  id          String   @id @default(cuid())
+  name        String
+  target      Decimal
+  deadline    DateTime?
+  importance  Int       @default(0)
+  saved       Decimal   @default(0)
+  familyId    String
+  family      Family    @relation(fields: [familyId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
