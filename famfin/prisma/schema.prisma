@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// For SQLite, enums are represented as constrained strings at the application level
+
+model Family {
+  id            String        @id @default(cuid())
+  name          String
+  users         User[]
+  invitations   Invitation[]
+  accounts      Account[]
+  categories    Category[]
+  budgets       Budget[]
+  goals         Goal[]
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   // OWNER | INVITED
+  familyId  String?
+  family    Family?  @relation(fields: [familyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  email     String
+  familyId  String
+  family    Family   @relation(fields: [familyId], references: [id])
+  usedAt    DateTime?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Account {
+  id           String       @id @default(cuid())
+  familyId     String
+  family       Family       @relation(fields: [familyId], references: [id])
+  name         String
+  type         String       // CHECKING | SAVINGS | CREDIT_CARD
+  balance      Decimal      @default(0)
+  card         Card?
+  transactions Transaction[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Card {
+  id           String   @id @default(cuid())
+  accountId    String   @unique
+  account      Account  @relation(fields: [accountId], references: [id])
+  brand        String?
+  closingDay   Int?     // dia de fechamento
+  dueDay       Int?     // dia de vencimento
+  creditLimit  Decimal?  @default(0)
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  familyId     String
+  family       Family        @relation(fields: [familyId], references: [id])
+  name         String
+  type         String        // INCOME | EXPENSE
+  transactions Transaction[]
+  budgets      Budget[]
+  createdAt    DateTime      @default(now())
+}
+
+model Transaction {
+  id                String    @id @default(cuid())
+  familyId          String
+  family            Family    @relation(fields: [familyId], references: [id])
+  accountId         String
+  account           Account   @relation(fields: [accountId], references: [id])
+  categoryId        String?
+  category          Category? @relation(fields: [categoryId], references: [id])
+  type              String    // INCOME | EXPENSE
+  amount            Decimal
+  date              DateTime
+  description       String?
+  paymentMethod     String    // CASH | DEBIT | CREDIT | PIX | TRANSFER
+  installmentsTotal Int?      // total de parcelas, se for crédito
+  installmentIndex  Int?      // número da parcela (1..n)
+  createdAt         DateTime  @default(now())
+}
+
+model Budget {
+  id         String     @id @default(cuid())
+  familyId   String
+  family     Family     @relation(fields: [familyId], references: [id])
+  type       String     // GENERAL | CATEGORY
+  month      Int
+  year       Int
+  limit      Decimal
+  categoryId String?
+  category   Category?  @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime   @default(now())
+}
+
+model Goal {
+  id            String   @id @default(cuid())
+  familyId      String
+  family        Family   @relation(fields: [familyId], references: [id])
+  name          String
+  targetAmount  Decimal
+  currentAmount Decimal  @default(0)
+  deadline      DateTime?
+  createdAt     DateTime  @default(now())
+}
