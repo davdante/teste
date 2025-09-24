@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETLINKS AUTHORITY - Enterprise Digital Authority Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'gradient': 'gradient 15s ease infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: #0a0e27;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0a0e27, #1e293b, #0f172a);
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        /* Premium Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
+            border: 2px solid rgba(15, 23, 42, 0.5);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4f46e5, #7c3aed);
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Premium Card */
+        .card-premium {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-premium:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Neon Glow Effect */
+        .neon-glow {
+            box-shadow: 
+                0 0 10px rgba(99, 102, 241, 0.5),
+                0 0 20px rgba(99, 102, 241, 0.3),
+                0 0 30px rgba(99, 102, 241, 0.1);
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 10px rgba(99, 102, 241, 0.5),
+                0 0 20px rgba(99, 102, 241, 0.3),
+                0 0 30px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Premium Button */
+        .btn-premium {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Authority Score Badge */
+        .authority-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .authority-badge.high {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+        
+        .authority-badge.medium {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .authority-badge.low {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        /* Animations */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Loader Premium */
+        .loader-premium {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: relative;
+            animation: rotate 1s linear infinite;
+        }
+        
+        .loader-premium::before {
+            content: '';
+            box-sizing: border-box;
+            position: absolute;
+            inset: 0px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            animation: pulsate 1.5s linear infinite;
+            border-color: #6366f1 transparent #8b5cf6 transparent;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulsate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Responsive Navigation */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Global Loader -->
+    <div id="globalLoader" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="glass-dark p-8 rounded-2xl">
+            <div class="loader-premium mx-auto mb-4"></div>
+            <p class="text-white font-medium">Processando...</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Main App -->
+    <div id="app" class="min-h-screen"></div>
+
+    <script>
+        // ================== CONFIGURAÇÃO E DADOS ==================
+        const APP_VERSION = '3.1.0';
+        const COMPANY_NAME = 'NETLINKS AUTHORITY';
+        
+        // Dados das empresas clientes
+        const SEED_DATA = {
+            users: [
+                // Admins
+                { id: 1, email: 'admin@netlinks.com', password: 'admin123', name: 'Admin Master', role: 'admin', avatar: '👨‍💼', company: 'NETLINKS' },
+                { id: 2, email: 'tech@netlinks.com', password: 'tech123', name: 'Tech Admin', role: 'admin', avatar: '👨‍💻', company: 'NETLINKS' },
+                
+                // Clientes
+                { id: 3, email: 'cz@binance.com', password: 'binance123', name: 'Changpeng Zhao', role: 'client', avatar: '🚀', company: 'Binance' },
+                { id: 4, email: 'manager@binance.com', password: 'binance123', name: 'Regional Manager BR', role: 'client', avatar: '📊', company: 'Binance' },
+                
+                { id: 5, email: 'wang@byd.com', password: 'byd123', name: 'Wang Chuanfu', role: 'client', avatar: '🚗', company: 'BYD' },
+                { id: 6, email: 'brasil@byd.com', password: 'byd123', name: 'Director Brasil', role: 'client', avatar: '⚡', company: 'BYD' },
+                
+                { id: 7, email: 'andre@btg.com', password: 'btg123', name: 'André Esteves', role: 'client', avatar: '🏦', company: 'Banco BTG' },
+                { id: 8, email: 'invest@btg.com', password: 'btg123', name: 'Head of Digital', role: 'client', avatar: '💼', company: 'Banco BTG' },
+                
+                { id: 9, email: 'karina@clinica.com', password: 'clinica123', name: 'Dra. Karina Silva', role: 'client', avatar: '👩‍⚕️', company: 'Clínica Karina' },
+                { id: 10, email: 'marketing@clinica.com', password: 'clinica123', name: 'Marketing Manager', role: 'client', avatar: '💅', company: 'Clínica Karina' },
+                
+                { id: 11, email: 'stelleo@mercadolivre.com', password: 'meli123', name: 'Stelleo Tolda', role: 'client', avatar: '🛒', company: 'Mercado Livre' },
+                { id: 12, email: 'growth@mercadolivre.com', password: 'meli123', name: 'Growth Manager', role: 'client', avatar: '📈', company: 'Mercado Livre' }
+            ],
+            
+            clients: [
+                {
+                    id: 1,
+                    name: 'Binance',
+                    industry: 'Criptomoedas',
+                    logo: '🌐',
+                    color: '#F3BA2F',
+                    baselineNS: 750,
+                    currentNS: 945,
+                    nsFactors: { domain_authority: 0.86, topical_relevance: 0.92, traffic_quality: 0.88, placement_context: 0.81, novelty_factor: 0.72, geo_multiplier: 1.06, industry_boost: 1.10 },
+                    kpis: {
+                        roi: 580,
+                        linksMes: 52,
+                        risco: 'baixo',
+                        trafficQualified: 450000
+                    },
+                    urlsFrozen: [
+                        'https://binance.com/pt-BR',
+                        'https://binance.com/pt-BR/trade',
+                        'https://binance.com/pt-BR/bitcoin'
+                    ]
+                },
+                {
+                    id: 2,
+                    name: 'BYD',
+                    industry: 'Automotivo/Elétrico',
+                    logo: '🚗',
+                    color: '#FF0000',
+                    baselineNS: 680,
+                    currentNS: 825,
+                    nsFactors: { domain_authority: 0.74, topical_relevance: 0.83, traffic_quality: 0.79, placement_context: 0.76, novelty_factor: 0.69, geo_multiplier: 1.03, industry_boost: 1.04 },
+                    kpis: {
+                        roi: 420,
+                        linksMes: 38,
+                        risco: 'baixo',
+                        trafficQualified: 320000
+                    },
+                    urlsFrozen: [
+                        'https://byd.com.br',
+                        'https://byd.com.br/veiculos',
+                        'https://byd.com.br/tecnologia'
+                    ]
+                },
+                {
+                    id: 3,
+                    name: 'Banco BTG',
+                    industry: 'Financeiro',
+                    logo: '🏦',
+                    color: '#000080',
+                    baselineNS: 820,
+                    currentNS: 910,
+                    nsFactors: { domain_authority: 0.82, topical_relevance: 0.88, traffic_quality: 0.84, placement_context: 0.79, novelty_factor: 0.64, geo_multiplier: 1.02, industry_boost: 1.08 },
+                    kpis: {
+                        roi: 380,
+                        linksMes: 45,
+                        risco: 'baixo',
+                        trafficQualified: 280000
+                    },
+                    urlsFrozen: [
+                        'https://btgpactual.com',
+                        'https://btgpactual.com/investimentos',
+                        'https://btgpactual.com/digital'
+                    ]
+                },
+                {
+                    id: 4,
+                    name: 'Clínica Karina',
+                    industry: 'Saúde/Estética',
+                    logo: '💅',
+                    color: '#FF69B4',
+                    baselineNS: 520,
+                    currentNS: 685,
+                    nsFactors: { domain_authority: 0.58, topical_relevance: 0.74, traffic_quality: 0.62, placement_context: 0.55, novelty_factor: 0.71, geo_multiplier: 1.00, industry_boost: 1.02 },
+                    kpis: {
+                        roi: 620,
+                        linksMes: 28,
+                        risco: 'médio',
+                        trafficQualified: 85000
+                    },
+                    urlsFrozen: [
+                        'https://clinicakarina.com.br',
+                        'https://clinicakarina.com.br/tratamentos',
+                        'https://clinicakarina.com.br/harmonizacao'
+                    ]
+                },
+                {
+                    id: 5,
+                    name: 'Mercado Livre',
+                    industry: 'E-commerce',
+                    logo: '🛒',
+                    color: '#FFE600',
+                    baselineNS: 880,
+                    currentNS: 965,
+                    nsFactors: { domain_authority: 0.91, topical_relevance: 0.90, traffic_quality: 0.93, placement_context: 0.87, novelty_factor: 0.77, geo_multiplier: 1.05, industry_boost: 1.09 },
+                    kpis: {
+                        roi: 490,
+                        linksMes: 58,
+                        risco: 'baixo',
+                        trafficQualified: 680000
+                    },
+                    urlsFrozen: [
+                        'https://mercadolivre.com.br',
+                        'https://mercadolivre.com.br/categorias',
+                        'https://mercadopago.com.br'
+                    ]
+                }
+            ],
+            
+            portals: [
+                // Tier A (NS > 900)
+                { id: 1, name: 'Folha de S.Paulo', theme: 'Notícias', ns: 960, traffic: 12000000, price: 35000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'folha.com.br' },
+                { id: 2, name: 'G1 - Globo', theme: 'Notícias', ns: 975, traffic: 25000000, price: 45000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'g1.globo.com' },
+                { id: 3, name: 'UOL', theme: 'Portal', ns: 950, traffic: 18000000, price: 38000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'uol.com.br' },
+                { id: 4, name: 'Estadão', theme: 'Notícias', ns: 940, traffic: 10000000, price: 32000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'estadao.com.br' },
+                { id: 5, name: 'Valor Econômico', theme: 'Economia', ns: 945, traffic: 5000000, price: 42000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'valor.com.br' },
+                { id: 6, name: 'CNN Brasil', theme: 'Notícias', ns: 920, traffic: 8000000, price: 28000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'cnnbrasil.com.br' },
+                { id: 7, name: 'InfoMoney', theme: 'Finanças', ns: 910, traffic: 4000000, price: 25000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'infomoney.com.br' },
+                
+                // Tier B (NS 700-900)
+                { id: 8, name: 'Exame', theme: 'Negócios', ns: 890, traffic: 6000000, price: 22000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'exame.com' },
+                { id: 9, name: 'Época Negócios', theme: 'Negócios', ns: 870, traffic: 3500000, price: 18000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'epocanegocios.com' },
+                { id: 10, name: 'IstoÉ Dinheiro', theme: 'Economia', ns: 850, traffic: 2800000, price: 16000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'istoedinheiro.com.br' },
+                { id: 11, name: 'TechTudo', theme: 'Tecnologia', ns: 840, traffic: 7000000, price: 15000, risk: 'baixo', pbnSuspect: false, geo: 'BR', domain: 'techtudo.com.br' },
+                { id: 12, name: 'Canaltech', theme: 'Tecnologia', ns: 820, traffic: 5500000, price: 14000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'canaltech.com.br' },
+                { id: 13, name: 'TecMundo', theme: 'Tecnologia', ns: 810, traffic: 4800000, price: 13000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'tecmundo.com.br' },
+                { id: 14, name: 'E-commerce Brasil', theme: 'E-commerce', ns: 780, traffic: 1200000, price: 8000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'ecommercebrasil.com.br' },
+                { id: 15, name: 'AutoEsporte', theme: 'Automotivo', ns: 790, traffic: 3200000, price: 12000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'autoesporte.globo.com' },
+                { id: 16, name: 'Quatro Rodas', theme: 'Automotivo', ns: 795, traffic: 2800000, price: 11000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'quatrorodas.abril.com.br' },
+                { id: 17, name: 'Veja Saúde', theme: 'Saúde', ns: 760, traffic: 2200000, price: 9000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'saude.abril.com.br' },
+                { id: 18, name: 'Minha Vida', theme: 'Saúde', ns: 750, traffic: 4500000, price: 8500, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'minhavida.com.br' },
+                { id: 19, name: 'Portal do Bitcoin', theme: 'Criptomoedas', ns: 720, traffic: 800000, price: 6000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'portaldobitcoin.com.br' },
+                { id: 20, name: 'Cointelegraph Brasil', theme: 'Criptomoedas', ns: 730, traffic: 950000, price: 7000, risk: 'médio', pbnSuspect: false, geo: 'BR', domain: 'cointelegraph.com.br' }
+            ],
+            
+            competitors: {
+                'Binance': [
+                    { name: 'Coinbase Brasil', nsTimeline: [680, 700, 720, 740, 755, 770, 780, 785, 790, 795, 798, 800] },
+                    { name: 'Crypto.com', nsTimeline: [620, 640, 660, 680, 695, 710, 720, 730, 735, 740, 745, 750] },
+                    { name: 'Foxbit', nsTimeline: [580, 590, 600, 615, 625, 635, 640, 645, 650, 655, 658, 660] }
+                ],
+                'BYD': [
+                    { name: 'Tesla Brasil', nsTimeline: [700, 720, 735, 750, 765, 775, 785, 790, 795, 800, 805, 810] },
+                    { name: 'GWM Brasil', nsTimeline: [550, 570, 590, 610, 625, 640, 650, 660, 665, 670, 675, 680] },
+                    { name: 'JAC Motors', nsTimeline: [480, 490, 500, 510, 520, 530, 535, 540, 545, 548, 550, 552] }
+                ],
+                'Banco BTG': [
+                    { name: 'XP Investimentos', nsTimeline: [780, 800, 820, 835, 850, 865, 875, 880, 885, 890, 893, 895] },
+                    { name: 'Banco Safra', nsTimeline: [720, 730, 740, 750, 760, 768, 775, 780, 783, 785, 788, 790] },
+                    { name: 'Credit Suisse Brasil', nsTimeline: [680, 685, 690, 695, 700, 705, 708, 710, 712, 714, 716, 718] }
+                ],
+                'Clínica Karina': [
+                    { name: 'Clínica Leger', nsTimeline: [500, 520, 540, 560, 575, 590, 600, 610, 615, 620, 623, 625] },
+                    { name: 'Eudora Estética', nsTimeline: [450, 470, 490, 510, 525, 540, 550, 560, 565, 570, 573, 575] },
+                    { name: 'Sephora Clinic', nsTimeline: [480, 495, 510, 525, 535, 545, 550, 555, 558, 560, 562, 565] }
+                ],
+                'Mercado Livre': [
+                    { name: 'Amazon Brasil', nsTimeline: [850, 870, 890, 905, 920, 935, 945, 950, 955, 958, 960, 962] },
+                    { name: 'Shopee', nsTimeline: [700, 730, 760, 790, 815, 840, 860, 875, 885, 895, 900, 905] },
+                    { name: 'Americanas', nsTimeline: [680, 690, 700, 710, 718, 725, 730, 733, 735, 737, 739, 740] }
+                ]
+            },
+            
+            matters: [],
+            tasks: [],
+            alerts: []
+        };
+
+        // ================== STORE (GERENCIAMENTO DE ESTADO) ==================
+        class Store {
+            constructor() {
+                this.data = {};
+                this.listeners = [];
+                this.init();
+            }
+            
+            init() {
+                const isFirstTime = !localStorage.getItem('netlinks_initialized');
+                
+                if (isFirstTime) {
+                    this.resetToSeeds();
+                } else {
+                    this.loadFromStorage();
+                }
+            }
+            
+            resetToSeeds() {
+                Object.keys(SEED_DATA).forEach(key => {
+                    this.data[key] = JSON.parse(JSON.stringify(SEED_DATA[key]));
+                    localStorage.setItem(`netlinks_${key}`, JSON.stringify(this.data[key]));
+                });
+                
+                localStorage.setItem('netlinks_initialized', 'true');
+                localStorage.removeItem('netlinks_currentUser');
+                this.data.currentUser = null;
+                
+                this.notify();
+                showToast('Sistema resetado com sucesso!', 'success');
+            }
+            
+            loadFromStorage() {
+                Object.keys(SEED_DATA).forEach(key => {
+                    const stored = localStorage.getItem(`netlinks_${key}`);
+                    this.data[key] = stored ? JSON.parse(stored) : SEED_DATA[key];
+                });
+                
+                const currentUser = localStorage.getItem('netlinks_currentUser');
+                this.data.currentUser = currentUser ? JSON.parse(currentUser) : null;
+            }
+            
+            get(key) {
+                return this.data[key];
+            }
+            
+            set(key, value) {
+                this.data[key] = value;
+                if (key === 'currentUser') {
+                    if (value) {
+                        localStorage.setItem('netlinks_currentUser', JSON.stringify(value));
+                    } else {
+                        localStorage.removeItem('netlinks_currentUser');
+                    }
+                } else {
+                    localStorage.setItem(`netlinks_${key}`, JSON.stringify(value));
+                }
+                this.notify();
+            }
+            
+            subscribe(callback) {
+                this.listeners.push(callback);
+            }
+            
+            notify() {
+                this.listeners.forEach(cb => cb(this.data));
+            }
+        }
+
+        // ================== ROUTER ==================
+        class Router {
+            constructor() {
+                this.currentRoute = null;
+                this.mobileMenuOpen = false;
+                this.init();
+            }
+            
+            init() {
+                window.addEventListener('hashchange', () => this.handleRoute());
+                this.handleRoute();
+            }
+            
+            handleRoute() {
+                const hash = window.location.hash.slice(1) || 'login';
+                const user = store.get('currentUser');
+                
+                if (hash !== 'login' && !user) {
+                    window.location.hash = 'login';
+                    return;
+                }
+                
+                if (hash === 'login' && user) {
+                    window.location.hash = 'dashboard';
+                    return;
+                }
+                
+                this.currentRoute = hash;
+                this.render(hash);
+            }
+            
+            render(route) {
+                const app = document.getElementById('app');
+                
+                if (route === 'login') {
+                    app.innerHTML = this.renderLogin();
+                } else {
+                    const user = store.get('currentUser');
+                    if (user.role === 'admin') {
+                        app.innerHTML = this.renderAdminLayout();
+                    } else {
+                        app.innerHTML = this.renderClientLayout();
+                    }
+                    
+                    const content = document.getElementById('content');
+                    const renderMethod = `render${route.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`;
+                    
+                    if (this[renderMethod]) {
+                        content.innerHTML = this[renderMethod]();
+                        this.initializePageScripts(route);
+                    } else {
+                        content.innerHTML = this.renderDashboard();
+                        this.initializePageScripts('dashboard');
+                    }
+                }
+            }
+            
+            renderLogin() {
+                return `
+                    <div class="min-h-screen flex items-center justify-center p-4">
+                        <div class="w-full max-w-5xl">
+                            <!-- Logo e Título -->
+                            <div class="text-center mb-8 animate-pulse">
+                                <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-4">
+                                    NETLINKS AUTHORITY
+                                </h1>
+                                <p class="text-gray-400 text-lg">Enterprise Digital Authority Platform v${APP_VERSION}</p>
+                            </div>
+                            
+                            <!-- Cards de Login -->
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- Admin Login -->
+                                <div class="card-premium p-8 rounded-2xl">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <h2 class="text-2xl font-bold text-white">Admin Access</h2>
+                                        <span class="text-4xl">👨‍💼</span>
+                                    </div>
+                                    
+                                    <form onsubmit="handleAdminLogin(event)">
+                                        <div class="mb-4">
+                                            <label class="block text-gray-300 text-sm font-medium mb-2">Admin Account</label>
+                                            <select id="adminEmail" class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none">
+                                                ${store.get('users').filter(u => u.role === 'admin').map(user => 
+                                                    `<option value="${user.email}">${user.name}</option>`
+                                                ).join('')}
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-6">
+                                            <label class="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                                            <input type="password" id="adminPassword" placeholder="••••••••" class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none">
+                                            <p class="text-xs text-gray-500 mt-2">Default: admin123 / tech123</p>
+                                        </div>
+                                        
+                                        <button type="submit" class="w-full btn-premium text-white font-bold py-3 px-4 rounded-lg">
+                                            Access Admin Panel
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <!-- Client Login -->
+                                <div class="card-premium p-8 rounded-2xl">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <h2 class="text-2xl font-bold text-white">Client Portal</h2>
+                                        <span class="text-4xl">🏢</span>
+                                    </div>
+                                    
+                                    <form onsubmit="handleClientLogin(event)">
+                                        <div class="mb-4">
+                                            <label class="block text-gray-300 text-sm font-medium mb-2">Company</label>
+                                            <select id="clientCompany" onchange="updateClientUsers()" class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-purple-500 focus:outline-none">
+                                                <option value="">Select Company...</option>
+                                                <option value="Binance">🌐 Binance</option>
+                                                <option value="BYD">🚗 BYD</option>
+                                                <option value="Banco BTG">🏦 Banco BTG</option>
+                                                <option value="Clínica Karina">💅 Clínica Karina</option>
+                                                <option value="Mercado Livre">🛒 Mercado Livre</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label class="block text-gray-300 text-sm font-medium mb-2">User</label>
+                                            <select id="clientEmail" disabled class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-purple-500 focus:outline-none">
+                                                <option value="">First select company...</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-6">
+                                            <label class="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                                            <input type="password" id="clientPassword" placeholder="••••••••" disabled class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-purple-500 focus:outline-none">
+                                            <p class="text-xs text-gray-500 mt-2" id="clientPasswordHint"></p>
+                                        </div>
+                                        
+                                        <button type="submit" id="clientLoginBtn" disabled class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-4 rounded-lg opacity-50 cursor-not-allowed">
+                                            Access Dashboard
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Features -->
+                            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">🏆</div>
+                                    <p class="text-gray-400 text-sm">Authority Score</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">⚔️</div>
+                                    <p class="text-gray-400 text-sm">Competitor Destroyer</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">🧠</div>
+                                    <p class="text-gray-400 text-sm">AIS & Penalty Predictor</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">📑</div>
+                                    <p class="text-gray-400 text-sm">Performance Reports</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderAdminLayout() {
+                const user = store.get('currentUser');
+                
+                return `
+                    <div class="flex h-screen">
+                        <!-- Sidebar -->
+                        <aside class="w-72 glass-dark border-r border-gray-700 sidebar no-print">
+                            <div class="p-6">
+                                <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+                                    NETLINKS ADMIN
+                                </h1>
+                                <p class="text-gray-400 text-xs mt-1">Enterprise Control Panel</p>
+                            </div>
+                            
+                            <nav class="px-4 pb-6">
+                                <div class="space-y-6">
+                                    <!-- Overview -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Overview</p>
+                                        <a href="#dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>📊</span> Dashboard Global
+                                        </a>
+                                        <a href="#clients" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🏢</span> Clientes
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Management -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Management</p>
+                                        <a href="#portals" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🌐</span> Portais & Publishers
+                                        </a>
+                                        <a href="#campaigns" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🚀</span> Campanhas Ativas
+                                        </a>
+                                        <a href="#analytics" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>📈</span> Analytics & Reports
+                                        </a>
+                                        <a href="#compliance" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🔍</span> Compliance & Auditoria
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- System -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">System</p>
+                                        <a href="#users" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>👥</span> Usuários
+                                        </a>
+                                        <a href="#settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>⚙️</span> Configurações
+                                        </a>
+                                        <a href="#logs" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>📋</span> Logs & Auditoria
+                                        </a>
+                                    </div>
+                                </div>
+                            </nav>
+                            
+                            <!-- User Profile -->
+                            <div class="absolute bottom-0 w-72 p-4 border-t border-gray-700">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-3xl">${user.avatar}</span>
+                                    <div>
+                                        <p class="text-white font-medium">${user.name}</p>
+                                        <p class="text-xs text-gray-400">${user.role.toUpperCase()}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="store.resetToSeeds()" class="flex-1 px-3 py-2 bg-gray-800 text-gray-300 rounded-lg text-sm hover:bg-gray-700">
+                                        🔄 Reset
+                                    </button>
+                                    <button onclick="logout()" class="flex-1 px-3 py-2 bg-red-900/50 text-red-400 rounded-lg text-sm hover:bg-red-900/70">
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </aside>
+                        
+                        <!-- Main Content -->
+                        <main class="flex-1 overflow-auto">
+                            <header class="glass-dark border-b border-gray-700 px-4 md:px-8 py-4 no-print">
+                                <div class="flex justify-between items-center">
+                                    <h2 class="text-2xl font-bold text-white">Admin Dashboard</h2>
+                                    <div class="flex items-center gap-4">
+                                        <button class="relative p-2 text-gray-400 hover:text-white" title="Notifications">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                            </svg>
+                                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                        </button>
+                                        <span class="text-gray-400 text-sm">
+                                            ${new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </span>
+                                    </div>
+                                </div>
+                            </header>
+                            
+                            <div id="content" class="p-4 md:p-8">
+                                <!-- Dynamic content -->
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+            
+            renderClientLayout() {
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                
+                return `
+                    <div class="flex h-screen">
+                        <!-- Sidebar -->
+                        <aside class="w-72 glass-dark border-r border-gray-700 sidebar no-print">
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-3xl">${client.logo}</span>
+                                    <div>
+                                        <h1 class="text-xl font-bold text-white">${client.name}</h1>
+                                        <p class="text-xs text-gray-400">Authority Platform</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Stats -->
+                                <div class="grid grid-cols-2 gap-2 mt-4">
+                                    <div class="bg-gray-800/50 rounded-lg p-2">
+                                        <p class="text-xs text-gray-400">Authority</p>
+                                        <p class="text-lg font-bold text-white">${client.currentNS}</p>
+                                    </div>
+                                    <div class="bg-gray-800/50 rounded-lg p-2">
+                                        <p class="text-xs text-gray-400">ROI</p>
+                                        <p class="text-lg font-bold text-green-400">${client.kpis.roi}%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <nav class="px-4 pb-6">
+                                <div class="space-y-6">
+                                    <!-- Analytics -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Analytics</p>
+                                        <a href="#dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>📊</span> Dashboard
+                                        </a>
+                                        <a href="#authority" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🏆</span> Authority Score
+                                        </a>
+                                        <a href="#roi" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>💰</span> ROI Analysis
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Intelligence -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Intelligence</p>
+                                        <a href="#competitors" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>⚔️</span> Competitor Destroyer
+                                        </a>
+                                        <a href="#ais" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🧠</span> Anchor Optimizer (AIS)
+                                        </a>
+                                        <a href="#portalscore" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🌐</span> Portal Qualification
+                                        </a>
+                                        <a href="#penalty" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🚨</span> Penalty Predictor
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Execution -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Execution</p>
+                                        <a href="#frozen" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>❄️</span> Frozen Cluster
+                                        </a>
+                                        <a href="#triangulation" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🔺</span> 3-Link Triangulation
+                                        </a>
+                                        <a href="#ntlk" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>🧩</span> NTLK Methodology
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Reports -->
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Reports</p>
+                                        <a href="#performance" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>📑</span> Performance
+                                        </a>
+                                        <a href="#export" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                            <span>📥</span> Export Data
+                                        </a>
+                                    </div>
+                                </div>
+                            </nav>
+                            
+                            <!-- User Profile -->
+                            <div class="absolute bottom-0 w-72 p-4 border-t border-gray-700">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-3xl">${user.avatar}</span>
+                                    <div>
+                                        <p class="text-white font-medium">${user.name}</p>
+                                        <p class="text-xs text-gray-400">${user.company}</p>
+                                    </div>
+                                </div>
+                                <button onclick="logout()" class="w-full px-3 py-2 bg-red-900/50 text-red-400 rounded-lg text-sm hover:bg-red-900/70">
+                                    Logout
+                                </button>
+                            </div>
+                        </aside>
+                        
+                        <!-- Main Content -->
+                        <main class="flex-1 overflow-auto">
+                            <header class="glass-dark border-b border-gray-700 px-4 md:px-8 py-4 no-print">
+                                <div class="flex justify-between items-center">
+                                    <h2 class="text-2xl font-bold text-white">${client.name} Dashboard</h2>
+                                    <div class="flex items-center gap-4">
+                                        <div class="text-sm text-gray-400">
+                                            <span>Industry: </span>
+                                            <span class="text-white font-medium">${client.industry}</span>
+                                        </div>
+                                        <span class="text-gray-400 text-sm">
+                                            ${new Date().toLocaleDateString('pt-BR')}
+                                        </span>
+                                        <button onclick="window.print()" class="hidden md:inline-flex btn-premium text-white font-semibold py-2 px-3 rounded-lg" title="Imprimir/Salvar PDF">
+                                            📄 Exportar PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            </header>
+                            
+                            <div id="content" class="p-4 md:p-8">
+                                <!-- Dynamic content -->
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+            
+            renderDashboard() {
+                const user = store.get('currentUser');
+                
+                if (user.role === 'admin') {
+                    return this.renderAdminDashboard();
+                } else {
+                    return this.renderClientDashboard();
+                }
+            }
+            
+            renderAdminDashboard() {
+                const clients = store.get('clients');
+                
+                return `
+                    <div class="space-y-6">
+                        <!-- Overview Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Total Clients</p>
+                                        <p class="text-3xl font-bold text-white mt-2">${clients.length}</p>
+                                    </div>
+                                    <span class="text-3xl">🏢</span>
+                                </div>
+                                <div class="text-green-400 text-sm">+2 this month</div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Active Campaigns</p>
+                                        <p class="text-3xl font-bold text-white mt-2">47</p>
+                                    </div>
+                                    <span class="text-3xl">🚀</span>
+                                </div>
+                                <div class="text-blue-400 text-sm">12 launching this week</div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Avg Authority Score</p>
+                                        <p class="text-3xl font-bold text-white mt-2">856</p>
+                                    </div>
+                                    <span class="text-3xl">📊</span>
+                                </div>
+                                <div class="text-green-400 text-sm">+28 points avg</div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Total Revenue</p>
+                                        <p class="text-3xl font-bold text-white mt-2">R$ 1.2M</p>
+                                    </div>
+                                    <span class="text-3xl">💰</span>
+                                </div>
+                                <div class="text-green-400 text-sm">+18% MoM</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Clients Performance -->
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-white mb-6">Clients Performance Overview</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-gray-700">
+                                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Client</th>
+                                            <th class="text-left py-3 px-4 text-gray-400 font-medium">Industry</th>
+                                            <th class="text-center py-3 px-4 text-gray-400 font-medium">Authority</th>
+                                            <th class="text-center py-3 px-4 text-gray-400 font-medium">ROI</th>
+                                            <th class="text-center py-3 px-4 text-gray-400 font-medium">Links/Month</th>
+                                            <th class="text-center py-3 px-4 text-gray-400 font-medium">Risk</th>
+                                            <th class="text-center py-3 px-4 text-gray-400 font-medium">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${clients.map(client => `
+                                            <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="text-2xl">${client.logo}</span>
+                                                        <span class="text-white font-medium">${client.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-gray-300">${client.industry}</td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="authority-badge high">${client.currentNS}</span>
+                                                </td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="text-green-400 font-bold">${client.kpis.roi}%</span>
+                                                </td>
+                                                <td class="py-3 px-4 text-center text-white">${client.kpis.linksMes}</td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                                                        client.kpis.risco === 'baixo' ? 'bg-green-900/50 text-green-400' :
+                                                        client.kpis.risco === 'médio' ? 'bg-yellow-900/50 text-yellow-400' :
+                                                        'bg-red-900/50 text-red-400'
+                                                    }">
+                                                        ${client.kpis.risco}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <a href="#clients" class="text-indigo-400 hover:text-indigo-300">View</a>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Authority Score Evolution</h3>
+                                <canvas id="authorityChart"></canvas>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Revenue by Client</h3>
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderClientDashboard() {
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                const competitors = store.get('competitors')[user.company] || [];
+                
+                return `
+                    <div class="space-y-6">
+                        <!-- KPI Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Authority Score</p>
+                                        <p class="text-4xl font-bold text-white mt-2">${client.currentNS}</p>
+                                    </div>
+                                    <span class="text-3xl">🏆</span>
+                                </div>
+                                <div class="text-green-400 text-sm">+${client.currentNS - client.baselineNS} from baseline</div>
+                                <div class="mt-4 bg-gray-800/50 rounded-lg p-2">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-400">Progress</span>
+                                        <span class="text-white">${Math.round((client.currentNS / 1000) * 100)}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full" style="width: ${(client.currentNS / 1000) * 100}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">ROI</p>
+                                        <p class="text-4xl font-bold text-green-400 mt-2">${client.kpis.roi}%</p>
+                                    </div>
+                                    <span class="text-3xl">💰</span>
+                                </div>
+                                <div class="text-green-400 text-sm">Above target</div>
+                                <div class="mt-4">
+                                    <canvas id="miniRoiChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Active Links</p>
+                                        <p class="text-4xl font-bold text-purple-400 mt-2">${client.kpis.linksMes}</p>
+                                    </div>
+                                    <span class="text-3xl">🔗</span>
+                                </div>
+                                <div class="text-blue-400 text-sm">This month</div>
+                                <div class="mt-4 space-y-2">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-gray-400">Tier A</span>
+                                        <span class="text-white">18 links</span>
+                                    </div>
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-gray-400">Tier B</span>
+                                        <span class="text-white">24 links</span>
+                                    </div>
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-gray-400">Tier C</span>
+                                        <span class="text-white">10 links</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-gray-400 text-sm">Qualified Traffic</p>
+                                        <p class="text-4xl font-bold text-blue-400 mt-2">${(client.kpis.trafficQualified / 1000).toFixed(0)}K</p>
+                                    </div>
+                                    <span class="text-3xl">👥</span>
+                                </div>
+                                <div class="text-green-400 text-sm">+23% vs last month</div>
+                                <div class="mt-4 text-xs space-y-1">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Conversion Rate</span>
+                                        <span class="text-white">3.4%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Bounce Rate</span>
+                                        <span class="text-white">42%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Competitor Analysis -->
+                        <div class="card-premium p-6 rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">Competitor Analysis</h3>
+                                <a href="#competitors" class="text-indigo-400 hover:text-indigo-300 text-sm">Open Competitor Destroyer →</a>
+                            </div>
+                            <canvas id="competitorChart"></canvas>
+                        </div>
+                        
+                        <!-- Recent Activity & Frozen URLs -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Recent Links Published</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+                                        <div>
+                                            <p class="text-white font-medium">Folha de S.Paulo</p>
+                                            <p class="text-xs text-gray-400">2 days ago</p>
+                                        </div>
+                                        <span class="authority-badge high">960</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+                                        <div>
+                                            <p class="text-white font-medium">InfoMoney</p>
+                                            <p class="text-xs text-gray-400">5 days ago</p>
+                                        </div>
+                                        <span class="authority-badge high">910</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+                                        <div>
+                                            <p class="text-white font-medium">Exame</p>
+                                            <p class="text-xs text-gray-400">1 week ago</p>
+                                        </div>
+                                        <span class="authority-badge medium">890</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-premium p-6 rounded-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-bold text-white">Frozen URLs</h3>
+                                    <a href="#frozen" class="text-indigo-400 hover:text-indigo-300 text-sm">Manage →</a>
+                                </div>
+                                <div class="space-y-3">
+                                    ${client.urlsFrozen.map(url => `
+                                        <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+                                            <div class="flex items-center gap-2">
+                                                <span>❄️</span>
+                                                <p class="text-gray-300 text-sm font-mono">${url}</p>
+                                            </div>
+                                            <span class="text-green-400 text-xs">Protected</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // ===== Client Routes =====
+            renderAuthority() {
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                const f = client.nsFactors;
+                const ns = Math.round((
+                    (f.domain_authority * 0.25 +
+                    f.topical_relevance * 0.30 +
+                    f.traffic_quality * 0.20 +
+                    f.placement_context * 0.15 +
+                    f.novelty_factor * 0.10) * f.geo_multiplier * f.industry_boost
+                ) * 1000);
+                
+                return `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="card-premium p-6 rounded-xl lg:col-span-2">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-white">Authority Score™ Projection</h3>
+                                    <span class="authority-badge high">Current: ${client.currentNS}</span>
+                                </div>
+                                <canvas id="nsProjectionChart"></canvas>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">NS™ Factors</h3>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex justify-between"><span class="text-gray-400">Domain Authority</span><span class="text-white">${Math.round(f.domain_authority*100)}%</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">Topical Relevance</span><span class="text-white">${Math.round(f.topical_relevance*100)}%</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">Traffic Quality</span><span class="text-white">${Math.round(f.traffic_quality*100)}%</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">Placement Context</span><span class="text-white">${Math.round(f.placement_context*100)}%</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">Novelty Factor</span><span class="text-white">${Math.round(f.novelty_factor*100)}%</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">Geo Multiplier</span><span class="text-white">${f.geo_multiplier}x</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">Industry Boost</span><span class="text-white">${f.industry_boost}x</span></div>
+                                    <div class="pt-3 border-t border-gray-700 flex justify-between text-indigo-300 font-semibold">
+                                        <span>Computed NS</span><span>${ns}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-lg font-bold text-white mb-4">NS™ Formula (simplificada)</h3>
+                            <pre class="text-xs text-gray-300 bg-gray-900/60 p-4 rounded-lg overflow-auto"><code>NS = (
+    domain_authority * 0.25 +
+    topical_relevance * 0.30 +
+    traffic_quality * 0.20 +
+    placement_context * 0.15 +
+    novelty_factor * 0.10
+) * geo_multiplier * industry_boost
+                            </code></pre>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderRoi() {
+                return `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="card-premium p-6 rounded-xl lg:col-span-2">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-white">ROI Predictor</h3>
+                                    <button id="roiCalcBtn" class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">Calcular</button>
+                                </div>
+                                <canvas id="roiProjectionChart"></canvas>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Parâmetros</h3>
+                                <div class="space-y-4 text-sm">
+                                    <div>
+                                        <label class="text-gray-300">Investimento mensal (R$)</label>
+                                        <input id="roiBudget" type="number" class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white" value="50000">
+                                    </div>
+                                    <div>
+                                        <label class="text-gray-300">Mix Tier A/B/C (%)</label>
+                                        <div class="grid grid-cols-3 gap-2 mt-1">
+                                            <input id="mixA" type="number" class="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white" value="30">
+                                            <input id="mixB" type="number" class="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white" value="50">
+                                            <input id="mixC" type="number" class="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white" value="20">
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">Deve somar 100%</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-gray-300">Horizonte (meses)</label>
+                                        <input id="roiMonths" type="number" class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white" value="6">
+                                    </div>
+                                    <div class="bg-gray-900/60 rounded-lg p-3">
+                                        <p class="text-gray-400 text-xs">Projeção considera curva de maturação de links e elasticidade por tier.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderCompetitors() {
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                return `
+                    <div class="space-y-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">Competitor Destroyer™ Timeline</h3>
+                                <div class="text-sm text-gray-300">${client.name} vs Top 3</div>
+                            </div>
+                            <canvas id="competitorDestroyerChart"></canvas>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <h4 class="text-lg font-bold text-white mb-3">Alertas de Mercado</h4>
+                                <div id="alertsList" class="space-y-3"></div>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h4 class="text-lg font-bold text-white mb-3">Strategic Blocking</h4>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center justify-between p-3 bg-gray-800/40 rounded-lg">
+                                        <span class="text-gray-300">Exclusividade de âncora "plataforma de criptomoedas"</span>
+                                        <button class="px-3 py-1 rounded bg-indigo-600 text-white text-xs">Ativo</button>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-800/40 rounded-lg">
+                                        <span class="text-gray-300">Bloqueio de anchor exata "comprar bitcoin"</span>
+                                        <button class="px-3 py-1 rounded bg-gray-700 text-gray-300 text-xs">Disponível</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderPerformance() {
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                return `
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white">Performance Report</h3>
+                            <div class="no-print flex gap-2">
+                                <button onclick="window.print()" class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">📄 Exportar PDF</button>
+                                <button id="exportCSV" class="bg-gray-800 text-gray-200 border border-gray-700 rounded-lg px-3 py-2">CSV</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <h4 class="text-white font-semibold mb-4">KPIs</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>Authority Score: <span class="text-white font-semibold">${client.currentNS}</span></li>
+                                    <li>ROI: <span class="text-green-400 font-semibold">${client.kpis.roi}%</span></li>
+                                    <li>Links no mês: <span class="text-white font-semibold">${client.kpis.linksMes}</span></li>
+                                    <li>Tráfego qualificado: <span class="text-white font-semibold">${client.kpis.trafficQualified}</span></li>
+                                    <li>Risco: <span class="text-white font-semibold">${client.kpis.risco}</span></li>
+                                </ul>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h4 class="text-white font-semibold mb-4">ROI vs Investimento</h4>
+                                <canvas id="perfRoiChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderExport() {
+                return `
+                    <div class="space-y-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-white mb-4">Export Center</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button onclick="window.print()" class="btn-premium text-white font-semibold py-3 px-4 rounded-lg">📄 Exportar PDF</button>
+                                <button id="exportJSON" class="bg-gray-800 text-gray-200 border border-gray-700 rounded-lg px-4 py-3">🗃️ Exportar JSON</button>
+                                <button id="exportCSV2" class="bg-gray-800 text-gray-200 border border-gray-700 rounded-lg px-4 py-3">📊 Exportar CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderFrozen() {
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                return `
+                    <div class="space-y-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">Frozen Cluster™</h3>
+                                <button id="addFrozen" class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">+ Add URL</button>
+                            </div>
+                            <div id="frozenList" class="space-y-3">
+                                ${client.urlsFrozen.map((url, idx) => `
+                                    <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+                                        <div class="flex items-center gap-2">
+                                            <span>❄️</span>
+                                            <p class="text-gray-300 text-sm font-mono">${url}</p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button data-idx="${idx}" class="unfreeze px-3 py-1 rounded bg-red-900/60 text-red-300 text-xs">Unfreeze</button>
+                                            <button class="px-3 py-1 rounded bg-indigo-600 text-white text-xs">Monitor 24/7</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderTriangulation() {
+                return `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-xl font-bold text-white mb-4">3-Link Triangulation™</h3>
+                                <div class="space-y-4 text-sm">
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div class="bg-gray-900/60 p-3 rounded-lg">
+                                            <p class="text-gray-400">Cliente</p>
+                                            <p class="text-white font-semibold">Posição premium</p>
+                                        </div>
+                                        <div class="bg-gray-900/60 p-3 rounded-lg">
+                                            <p class="text-gray-400">Parceiro</p>
+                                            <p class="text-white font-semibold">Carona</p>
+                                        </div>
+                                        <div class="bg-gray-900/60 p-3 rounded-lg">
+                                            <p class="text-gray-400">Netlinks</p>
+                                            <p class="text-white font-semibold">Network</p>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div>
+                                            <label class="text-gray-300">Preço portal</label>
+                                            <input id="triPrice" type="number" value="30000" class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white">
+                                        </div>
+                                        <div>
+                                            <label class="text-gray-300">% Repassado parceiro</label>
+                                            <input id="triPartner" type="number" value="20" class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white">
+                                        </div>
+                                        <div>
+                                            <label class="text-gray-300">% Retido rede</label>
+                                            <input id="triNetwork" type="number" value="10" class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white">
+                                        </div>
+                                    </div>
+                                    <button id="triCalc" class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">Calcular ROI</button>
+                                    <div id="triResult" class="text-gray-300"></div>
+                                </div>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Distribuição de Valor</h3>
+                                <canvas id="triDonut"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderNtlk() {
+                return `
+                    <div class="space-y-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-white mb-4">NTLK Methodology</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                ${['Nest','Test','Launch','Knowledge'].map((step, idx) => `
+                                    <div class="bg-gray-900/60 rounded-xl p-4 border border-gray-800">
+                                        <div class="text-3xl mb-2">${['🥚','🧪','🚀','📚'][idx]}</div>
+                                        <p class="text-white font-semibold">${step}</p>
+                                        <p class="text-gray-400 text-sm mt-1">${[
+                                            'Ideação, clusterização e seleção de portais',
+                                            'Teste de variações de âncora e contexto',
+                                            'Lançamento escalável com QA',
+                                            'Aprendizado, feedback e ajuste contínuo'
+                                        ][idx]}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderAis() {
+                return `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="card-premium p-6 rounded-xl lg:col-span-2">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-white">Anchor Intelligence System (AIS™)</h3>
+                                    <button id="aisRecommend" class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">Recomendar</button>
+                                </div>
+                                <canvas id="aisChart"></canvas>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Parâmetros</h3>
+                                <div class="space-y-4 text-sm">
+                                    <div>
+                                        <label class="text-gray-300">Âncora exata (%)</label>
+                                        <input id="anchorExact" type="range" min="0" max="100" value="25" class="w-full">
+                                        <div class="text-right text-gray-300 text-xs"><span id="anchorExactVal">25</span>%</div>
+                                    </div>
+                                    <div>
+                                        <label class="text-gray-300">Âncora parcial (%)</label>
+                                        <input id="anchorPartial" type="range" min="0" max="100" value="35" class="w-full">
+                                        <div class="text-right text-gray-300 text-xs"><span id="anchorPartialVal">35</span>%</div>
+                                    </div>
+                                    <div>
+                                        <label class="text-gray-300">Brand/Naked (%)</label>
+                                        <input id="anchorBrand" type="range" min="0" max="100" value="40" class="w-full">
+                                        <div class="text-right text-gray-300 text-xs"><span id="anchorBrandVal">40</span>%</div>
+                                    </div>
+                                    <div id="aisWarning" class="hidden text-yellow-300 text-sm">Risco de over-optimization detectado</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderPortalscore() {
+                const portals = store.get('portals');
+                return `
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white">Portal Qualification Engine</h3>
+                            <input id="portalSearch" placeholder="Buscar..." class="px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-white w-64" />
+                        </div>
+                        <div class="card-premium p-6 rounded-xl overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-700 text-gray-400">
+                                        <th class="text-left py-2">Portal</th>
+                                        <th class="text-left py-2">Tema</th>
+                                        <th class="text-center py-2">NS</th>
+                                        <th class="text-center py-2">Tráfego</th>
+                                        <th class="text-center py-2">Preço</th>
+                                        <th class="text-center py-2">Risco</th>
+                                        <th class="text-center py-2">Geo</th>
+                                        <th class="text-center py-2">Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="portalTable">
+                                    ${portals.map(p => {
+                                        const score = Math.round((p.ns/10) + (p.traffic/100000) - (p.price/5000) - (p.pbnSuspect?30:0));
+                                        return `
+                                            <tr class="border-b border-gray-800 hover:bg-gray-800/30">
+                                                <td class="py-2 text-white">${p.name}</td>
+                                                <td class="py-2 text-gray-300">${p.theme}</td>
+                                                <td class="py-2 text-center text-white">${p.ns}</td>
+                                                <td class="py-2 text-center text-white">${(p.traffic/1000000).toFixed(1)}M</td>
+                                                <td class="py-2 text-center text-white">R$ ${(p.price/1000).toFixed(0)}k</td>
+                                                <td class="py-2 text-center ${p.risk==='baixo'?'text-green-400':p.risk==='médio'?'text-yellow-400':'text-red-400'}">${p.risk}</td>
+                                                <td class="py-2 text-center text-gray-300">${p.geo}</td>
+                                                <td class="py-2 text-center ${score>120?'text-green-400':score>90?'text-yellow-400':'text-red-400'}">${score}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderPenalty() {
+                return `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="card-premium p-6 rounded-xl lg:col-span-2">
+                                <h3 class="text-xl font-bold text-white mb-4">Penalty Predictor</h3>
+                                <canvas id="penaltyChart"></canvas>
+                            </div>
+                            <div class="card-premium p-6 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Risco Atual</h3>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 h-24 rounded-full neon-glow flex items-center justify-center bg-gray-900/60">
+                                        <span id="penaltyGauge" class="text-2xl text-green-400">11%</span>
+                                    </div>
+                                    <div class="text-xs text-gray-300">
+                                        <p>Baseado em 50+ fatores: densidade de âncora, repetição de portal, contexto, e padrões temporais.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // ===== Admin Routes =====
+            renderClients() { return this.renderAdminDashboard(); }
+            
+            renderPortals() {
+                return this.renderPortalscore();
+            }
+            
+            renderCampaigns() {
+                return `
+                    <div class="space-y-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">Campanhas Ativas</h3>
+                                <button class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">+ Nova Campanha</button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                ${store.get('clients').map(c => `
+                                    <div class="bg-gray-900/60 rounded-xl p-4 border border-gray-800">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-2xl">${c.logo}</span>
+                                                <span class="text-white font-semibold">${c.name}</span>
+                                            </div>
+                                            <span class="authority-badge high">${c.currentNS}</span>
+                                        </div>
+                                        <p class="text-xs text-gray-400">${c.industry}</p>
+                                        <div class="mt-3 text-xs text-gray-300">Links este mês: <span class="text-white font-semibold">${c.kpis.linksMes}</span></div>
+                                        <button class="mt-3 w-full bg-gray-800 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm">Ver campanha</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderAnalytics() {
+                return `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-lg font-bold text-white mb-4">Revenue Analytics</h3>
+                            <canvas id="admRevenue"></canvas>
+                        </div>
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-lg font-bold text-white mb-4">Authority Distribution</h3>
+                            <canvas id="admAuthority"></canvas>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderCompliance() {
+                return `
+                    <div class="space-y-6">
+                        <div class="card-premium p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-white mb-4">Compliance & Auditoria</h3>
+                            <ul class="list-disc list-inside text-gray-300 text-sm space-y-1">
+                                <li>WAF ativo, rate limiting por API Gateway</li>
+                                <li>Criptografia ponta a ponta de dados sensíveis</li>
+                                <li>Auditoria SOC2 alinhada (simulada)</li>
+                                <li>LGPD/GDPR ready</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderUsers() {
+                const users = store.get('users');
+                return `
+                    <div class="card-premium p-6 rounded-xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-white">Usuários</h3>
+                            <button class="btn-premium text-white font-semibold py-2 px-3 rounded-lg">+ Novo Usuário</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-700 text-gray-400">
+                                        <th class="text-left py-2">Nome</th>
+                                        <th class="text-left py-2">Email</th>
+                                        <th class="text-left py-2">Papel</th>
+                                        <th class="text-left py-2">Empresa</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${users.map(u => `
+                                        <tr class="border-b border-gray-800 hover:bg-gray-800/30">
+                                            <td class="py-2 text-white">${u.name}</td>
+                                            <td class="py-2 text-gray-300">${u.email}</td>
+                                            <td class="py-2 text-gray-300">${u.role}</td>
+                                            <td class="py-2 text-gray-300">${u.company}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderSettings() {
+                return `
+                    <div class="card-premium p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-white mb-4">Configurações</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <label class="text-gray-300">Branding (White-label)</label>
+                                <input class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white" placeholder="Nome da agência">
+                            </div>
+                            <div>
+                                <label class="text-gray-300">Timezone</label>
+                                <select class="w-full mt-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white"><option>America/Sao_Paulo</option></select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderLogs() {
+                const now = new Date().toLocaleString('pt-BR');
+                return `
+                    <div class="card-premium p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-white mb-4">Logs & Auditoria</h3>
+                        <div class="space-y-2 text-sm text-gray-300 max-h-[60vh] overflow-auto">
+                            ${['Login admin','Atualização de NS','Export PDF','Novo portal adicionado','Frozen URL alterada'].map(ev => `
+                                <div class="p-2 bg-gray-900/60 rounded">${now} - ${ev}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            initializePageScripts(route) {
+                setTimeout(() => {
+                    if (route === 'dashboard') {
+                        this.initDashboardCharts();
+                    }
+                    if (route === 'authority') {
+                        this.initNsProjection();
+                    }
+                    if (route === 'roi') {
+                        this.initRoiPredictor();
+                    }
+                    if (route === 'competitors') {
+                        this.initCompetitorDestroyer();
+                    }
+                    if (route === 'performance') {
+                        this.initPerformanceCharts();
+                        this.initExporters();
+                    }
+                    if (route === 'export') {
+                        this.initExporters();
+                    }
+                    if (route === 'ais') {
+                        this.initAis();
+                    }
+                    if (route === 'portalscore' || route === 'portals') {
+                        this.initPortalSearch();
+                    }
+                    if (route === 'penalty') {
+                        this.initPenalty();
+                    }
+                    if (route === 'frozen') {
+                        this.initFrozen();
+                    }
+                    if (route === 'triangulation') {
+                        this.initTriangulation();
+                    }
+                    if (route === 'analytics') {
+                        this.initAdminAnalytics();
+                    }
+                }, 100);
+            }
+            
+            initDashboardCharts() {
+                const user = store.get('currentUser');
+                
+                if (user.role === 'admin') {
+                    // Admin charts
+                    const authorityCtx = document.getElementById('authorityChart');
+                    if (authorityCtx) {
+                        new Chart(authorityCtx.getContext('2d'), {
+                            type: 'line',
+                            data: {
+                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                                datasets: store.get('clients').map(client => ({
+                                    label: client.name,
+                                    data: [client.baselineNS, client.baselineNS+20, client.baselineNS+40, client.baselineNS+60, client.baselineNS+80, client.currentNS],
+                                    borderColor: client.color,
+                                    tension: 0.3
+                                }))
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { labels: { color: '#fff' } } },
+                                scales: {
+                                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                                }
+                            }
+                        });
+                    }
+                    const revenueCtx = document.getElementById('revenueChart');
+                    if (revenueCtx) {
+                        new Chart(revenueCtx.getContext('2d'), {
+                            type: 'bar',
+                            data: {
+                                labels: store.get('clients').map(c => c.name),
+                                datasets: [{
+                                    label: 'MRR (R$)',
+                                    data: store.get('clients').map((_, i) => (i+1)*200000),
+                                    backgroundColor: 'rgba(99, 102, 241, 0.6)'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { labels: { color: '#fff' } } },
+                                scales: {
+                                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    // Client charts
+                    const competitorCtx = document.getElementById('competitorChart');
+                    if (competitorCtx) {
+                        const client = store.get('clients').find(c => c.name === user.company);
+                        const competitors = store.get('competitors')[user.company] || [];
+                        
+                        new Chart(competitorCtx.getContext('2d'), {
+                            type: 'line',
+                            data: {
+                                labels: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'],
+                                datasets: [
+                                    {
+                                        label: client.name,
+                                        data: [client.baselineNS, 780, 810, 830, 850, 870, 885, 900, 915, 930, 940, client.currentNS],
+                                        borderColor: '#6366f1',
+                                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                        tension: 0.3,
+                                        fill: true
+                                    },
+                                    ...competitors.map((comp, idx) => ({
+                                        label: comp.name,
+                                        data: comp.nsTimeline,
+                                        borderColor: ['#f59e0b', '#ef4444', '#10b981'][idx],
+                                        tension: 0.3
+                                    }))
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { labels: { color: '#fff' } } },
+                                scales: {
+                                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                                }
+                            }
+                        });
+                    }
+                    const miniRoiCtx = document.getElementById('miniRoiChart');
+                    if (miniRoiCtx) {
+                        new Chart(miniRoiCtx.getContext('2d'), {
+                            type: 'bar',
+                            data: {
+                                labels: ['W1','W2','W3','W4'],
+                                datasets: [{ data: [12,18,22,25], backgroundColor: 'rgba(16, 185, 129, 0.7)' }]
+                            },
+                            options: {
+                                plugins: { legend: { display: false } },
+                                scales: { x: { ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } }
+                            }
+                        });
+                    }
+                }
+            }
+            
+            initNsProjection() {
+                const ctx = document.getElementById('nsProjectionChart');
+                if (!ctx) return;
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Now','+1m','+2m','+3m','+4m','+5m','+6m'],
+                        datasets: [{
+                            label: 'Projection',
+                            data: [client.currentNS, client.currentNS+10, client.currentNS+22, client.currentNS+35, client.currentNS+49, client.currentNS+62, Math.min(1000, client.currentNS+80)],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: { plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
+                });
+            }
+            
+            initRoiPredictor() {
+                const ctx = document.getElementById('roiProjectionChart');
+                const btn = document.getElementById('roiCalcBtn');
+                if (!ctx || !btn) return;
+                const compute = () => {
+                    const budget = Number(document.getElementById('roiBudget').value || 0);
+                    const a = Number(document.getElementById('mixA').value||0)/100;
+                    const b = Number(document.getElementById('mixB').value||0)/100;
+                    const c = Number(document.getElementById('mixC').value||0)/100;
+                    const months = Math.max(1, Number(document.getElementById('roiMonths').value||6));
+                    const tierLift = (a*1.0 + b*0.6 + c*0.35); // simplificado
+                    const base = budget * 0.02; // conversão base
+                    const values = Array.from({length: months}, (_, i) => Math.round(base * (1 + tierLift) * (1 + i*0.15)));
+                    return { labels: values.map((_, i) => `M${i+1}`), values };
+                };
+                const initial = compute();
+                let chart = new Chart(ctx.getContext('2d'), {
+                    type: 'bar', data: { labels: initial.labels, datasets: [{ label: 'Receita estimada (R$)', data: initial.values, backgroundColor: 'rgba(16,185,129,0.6)' }] },
+                    options: { plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
+                });
+                btn.onclick = () => { const next = compute(); chart.data.labels = next.labels; chart.data.datasets[0].data = next.values; chart.update(); showToast('ROI recalculado', 'success'); };
+            }
+            
+            initCompetitorDestroyer() {
+                const ctx = document.getElementById('competitorDestroyerChart');
+                if (!ctx) return;
+                const user = store.get('currentUser');
+                const client = store.get('clients').find(c => c.name === user.company);
+                const comps = store.get('competitors')[user.company] || [];
+                new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+                        datasets: [
+                            { label: client.name, data: [client.baselineNS, 780, 810, 830, 850, 870, 885, 900, 915, 930, 940, client.currentNS], borderColor: '#6366f1', tension: 0.3 },
+                            ...comps.map((c, i) => ({ label: c.name, data: c.nsTimeline, borderColor: ['#f59e0b','#ef4444','#10b981'][i], tension: 0.3 }))
+                        ]
+                    },
+                    options: { plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
+                });
+                const alerts = [
+                    'Concorrente ganhou link em portal Exame',
+                    'Shopee aumentou anchors exatas em 12%',
+                    'Portal do Bitcoin abriu pauta de finanças'
+                ];
+                const list = document.getElementById('alertsList');
+                if (list) {
+                    list.innerHTML = alerts.map(a => `<div class="p-3 bg-gray-800/40 rounded text-gray-300 text-sm">⚠️ ${a}</div>`).join('');
+                }
+            }
+            
+            initPerformanceCharts() {
+                const perf = document.getElementById('perfRoiChart');
+                if (!perf) return;
+                new Chart(perf.getContext('2d'), {
+                    type: 'line', data: { labels: ['M1','M2','M3','M4','M5','M6'], datasets: [{ label: 'ROI %', data: [220,260,310,370,450,520], borderColor: '#10b981', tension: 0.3 }] },
+                    options: { plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
+                });
+            }
+            
+            initExporters() {
+                const toCSV = (obj) => {
+                    const rows = Object.entries(obj).map(([k,v]) => `${k},${JSON.stringify(v)}`);
+                    return 'chave,valor\n' + rows.join('\n');
+                };
+                const download = (name, content, type='text/plain') => {
+                    const blob = new Blob([content], {type});
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = name;
+                    a.click();
+                };
+                const btnJ = document.getElementById('exportJSON');
+                const btnC = document.getElementById('exportCSV');
+                const btnC2 = document.getElementById('exportCSV2');
+                const user = store.get('currentUser');
+                const client = user ? store.get('clients').find(c => c.name === user.company) : null;
+                if (btnJ) btnJ.onclick = () => download('report.json', JSON.stringify(client || store.data, null, 2), 'application/json');
+                if (btnC) btnC.onclick = () => download('report.csv', toCSV(client || {}), 'text/csv');
+                if (btnC2) btnC2.onclick = () => download('export.csv', toCSV(client || {}), 'text/csv');
+            }
+            
+            initAis() {
+                const ctx = document.getElementById('aisChart');
+                if (!ctx) return;
+                const exact = document.getElementById('anchorExact');
+                const partial = document.getElementById('anchorPartial');
+                const brand = document.getElementById('anchorBrand');
+                const setVals = () => {
+                    document.getElementById('anchorExactVal').textContent = exact.value;
+                    document.getElementById('anchorPartialVal').textContent = partial.value;
+                    document.getElementById('anchorBrandVal').textContent = brand.value;
+                    const total = Number(exact.value)+Number(partial.value)+Number(brand.value);
+                    const warn = document.getElementById('aisWarning');
+                    if (Number(exact.value) > 35 || total !== 100) { warn.classList.remove('hidden'); } else { warn.classList.add('hidden'); }
+                };
+                let chart = new Chart(ctx.getContext('2d'), {
+                    type: 'doughnut', data: { labels: ['Exata','Parcial','Brand/Naked'], datasets: [{ data: [25,35,40], backgroundColor: ['#ef4444','#f59e0b','#6366f1'] }] },
+                    options: { plugins: { legend: { labels: { color: '#fff' } } } }
+                });
+                [exact, partial, brand].forEach(inp => inp.addEventListener('input', () => { setVals(); chart.data.datasets[0].data = [Number(exact.value), Number(partial.value), Number(brand.value)]; chart.update(); }));
+                const btn = document.getElementById('aisRecommend');
+                if (btn) btn.onclick = () => { exact.value = '20'; partial.value='40'; brand.value='40'; setVals(); chart.data.datasets[0].data=[20,40,40]; chart.update(); showToast('Distribuição otimizada aplicada', 'success'); };
+                setVals();
+            }
+            
+            initPortalSearch() {
+                const input = document.getElementById('portalSearch');
+                const tbody = document.getElementById('portalTable');
+                if (!input || !tbody) return;
+                input.addEventListener('input', () => {
+                    const q = input.value.toLowerCase();
+                    const portals = store.get('portals').filter(p => `${p.name} ${p.theme} ${p.domain}`.toLowerCase().includes(q));
+                    tbody.innerHTML = portals.map(p => {
+                        const score = Math.round((p.ns/10) + (p.traffic/100000) - (p.price/5000) - (p.pbnSuspect?30:0));
+                        return `
+                            <tr class="border-b border-gray-800 hover:bg-gray-800/30">
+                                <td class="py-2 text-white">${p.name}</td>
+                                <td class="py-2 text-gray-300">${p.theme}</td>
+                                <td class="py-2 text-center text-white">${p.ns}</td>
+                                <td class="py-2 text-center text-white">${(p.traffic/1000000).toFixed(1)}M</td>
+                                <td class="py-2 text-center text-white">R$ ${(p.price/1000).toFixed(0)}k</td>
+                                <td class="py-2 text-center ${p.risk==='baixo'?'text-green-400':p.risk==='médio'?'text-yellow-400':'text-red-400'}">${p.risk}</td>
+                                <td class="py-2 text-center text-gray-300">${p.geo}</td>
+                                <td class="py-2 text-center ${score>120?'text-green-400':score>90?'text-yellow-400':'text-red-400'}">${score}</td>
+                            </tr>`;
+                    }).join('');
+                });
+            }
+            
+            initPenalty() {
+                const ctx = document.getElementById('penaltyChart');
+                const gauge = document.getElementById('penaltyGauge');
+                if (!ctx || !gauge) return;
+                new Chart(ctx.getContext('2d'), {
+                    type: 'radar', data: { labels: ['Anchor','Repetição','Contexto','Velocidade','Diversidade','Padrão'], datasets: [{ label: 'Risco relativo', data: [20,15,12,10,8,9], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.2)' }] },
+                    options: { plugins: { legend: { labels: { color: '#fff' } } }, scales: { r: { angleLines: { color: '#1e293b' }, grid: { color: '#1e293b' }, pointLabels: { color: '#94a3b8' }, ticks: { display: false } } } }
+                });
+                gauge.textContent = '11%';
+            }
+            
+            initFrozen() {
+                const add = document.getElementById('addFrozen');
+                const list = document.getElementById('frozenList');
+                if (!add || !list) return;
+                add.onclick = () => {
+                    const url = prompt('URL para congelar:');
+                    if (!url) return;
+                    const user = store.get('currentUser');
+                    const clients = store.get('clients');
+                    const idx = clients.findIndex(c => c.name === user.company);
+                    clients[idx].urlsFrozen.push(url);
+                    store.set('clients', clients);
+                    router.render('frozen');
+                };
+                list.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('unfreeze')) {
+                        const i = Number(e.target.getAttribute('data-idx'));
+                        const user = store.get('currentUser');
+                        const clients = store.get('clients');
+                        const idx = clients.findIndex(c => c.name === user.company);
+                        clients[idx].urlsFrozen.splice(i,1);
+                        store.set('clients', clients);
+                        router.render('frozen');
+                    }
+                });
+            }
+            
+            initTriangulation() {
+                const price = document.getElementById('triPrice');
+                const partner = document.getElementById('triPartner');
+                const network = document.getElementById('triNetwork');
+                const btn = document.getElementById('triCalc');
+                const out = document.getElementById('triResult');
+                const donut = document.getElementById('triDonut');
+                if (!btn || !out || !donut) return;
+                let chart = new Chart(donut.getContext('2d'), {
+                    type: 'doughnut', data: { labels: ['Cliente','Parceiro','Rede'], datasets: [{ data: [70,20,10], backgroundColor: ['#6366f1','#f59e0b','#10b981'] }] }, options: { plugins: { legend: { labels: { color: '#fff' } } } }
+                });
+                btn.onclick = () => {
+                    const p = Number(price.value||0);
+                    const pr = Number(partner.value||0);
+                    const nw = Number(network.value||0);
+                    const cl = Math.max(0, 100 - pr - nw);
+                    chart.data.datasets[0].data = [cl, pr, nw];
+                    chart.update();
+                    const roi = (cl/100)*p*3/(p) * 100; // retorno relativo simples
+                    out.innerHTML = `<div class="mt-2">Distribuição: Cliente ${cl}% • Parceiro ${pr}% • Rede ${nw}%<br><span class="text-green-400 font-semibold">ROI relativo estimado: ${roi.toFixed(0)}%</span></div>`;
+                };
+                btn.click();
+            }
+            
+            initAdminAnalytics() {
+                const r = document.getElementById('admRevenue');
+                const a = document.getElementById('admAuthority');
+                if (r) new Chart(r.getContext('2d'), { type: 'bar', data: { labels: ['Q1','Q2','Q3','Q4'], datasets: [{ label: 'MRR (R$)', data: [200000,750000,2100000,3500000], backgroundColor: 'rgba(99,102,241,0.6)'}] }, options: { plugins: { legend: { labels: { color:'#fff' } } }, scales: { x: { ticks:{ color:'#94a3b8' } }, y:{ ticks:{ color:'#94a3b8' } } } } });
+                if (a) new Chart(a.getContext('2d'), { type: 'pie', data: { labels: store.get('clients').map(c=>c.name), datasets: [{ data: store.get('clients').map(c=>c.currentNS), backgroundColor: ['#6366f1','#f59e0b','#10b981','#ef4444','#8b5cf6'] }] }, options: { plugins: { legend: { labels: { color:'#fff' } } } } });
+            }
+        }
+
+        // ================== FUNÇÕES GLOBAIS ==================
+        
+        function showLoader() {
+            document.getElementById('globalLoader').classList.remove('hidden');
+        }
+        
+        function hideLoader() {
+            document.getElementById('globalLoader').classList.add('hidden');
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'from-green-500 to-green-600',
+                error: 'from-red-500 to-red-600',
+                warning: 'from-yellow-500 to-yellow-600',
+                info: 'from-blue-500 to-blue-600'
+            };
+            
+            toast.className = `glass-dark p-4 rounded-lg mb-2 animate-slide-down`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-gradient-to-b ${colors[type]} rounded-full"></div>
+                    <p class="text-white">${message}</p>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        async function fakeDelay(ms = 800) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Login Functions
+        function updateClientUsers() {
+            const company = document.getElementById('clientCompany').value;
+            const userSelect = document.getElementById('clientEmail');
+            const passwordInput = document.getElementById('clientPassword');
+            const passwordHint = document.getElementById('clientPasswordHint');
+            const loginBtn = document.getElementById('clientLoginBtn');
+            
+            if (company) {
+                const users = store.get('users').filter(u => u.company === company);
+                
+                userSelect.innerHTML = users.map(user => 
+                    `<option value="${user.email}">${user.name}</option>`
+                ).join('');
+                
+                userSelect.disabled = false;
+                passwordInput.disabled = false;
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                loginBtn.classList.add('btn-premium');
+                
+                // Set password hint based on company
+                const hints = {
+                    'Binance': 'binance123',
+                    'BYD': 'byd123',
+                    'Banco BTG': 'btg123',
+                    'Clínica Karina': 'clinica123',
+                    'Mercado Livre': 'meli123'
+                };
+                passwordHint.textContent = `Default: ${hints[company]}`;
+            } else {
+                userSelect.innerHTML = '<option value="">First select company...</option>';
+                userSelect.disabled = true;
+                passwordInput.disabled = true;
+                loginBtn.disabled = true;
+                loginBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                loginBtn.classList.remove('btn-premium');
+                passwordHint.textContent = '';
+            }
+        }
+        
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            showLoader();
+            
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            await fakeDelay();
+            
+            const user = store.get('users').find(u => u.email === email);
+            
+            if (user && (password === 'admin123' || password === 'tech123' || password === user.password)) {
+                store.set('currentUser', user);
+                showToast('Login successful! Welcome Admin.', 'success');
+                setTimeout(() => {
+                    window.location.hash = 'dashboard';
+                }, 500);
+            } else {
+                showToast('Invalid credentials!', 'error');
+            }
+            
+            hideLoader();
+        }
+        
+        async function handleClientLogin(event) {
+            event.preventDefault();
+            showLoader();
+            
+            const email = document.getElementById('clientEmail').value;
+            const password = document.getElementById('clientPassword').value;
+            
+            await fakeDelay();
+            
+            const user = store.get('users').find(u => u.email === email);
+            
+            if (user && password === user.password) {
+                store.set('currentUser', user);
+                showToast(`Welcome to ${user.company} Dashboard!`, 'success');
+                setTimeout(() => {
+                    window.location.hash = 'dashboard';
+                }, 500);
+            } else {
+                showToast('Invalid credentials!', 'error');
+            }
+            
+            hideLoader();
+        }
+        
+        function logout() {
+            showLoader();
+            store.set('currentUser', null);
+            showToast('Logged out successfully', 'info');
+            setTimeout(() => {
+                window.location.hash = 'login';
+                hideLoader();
+            }, 500);
+        }
+
+        // ================== INICIALIZAÇÃO ==================
+        let store, router;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            store = new Store();
+            router = new Router();
+            
+            // Attach global functions to window
+            window.store = store;
+            window.router = router;
+            window.showLoader = showLoader;
+            window.hideLoader = hideLoader;
+            window.showToast = showToast;
+            window.logout = logout;
+            window.updateClientUsers = updateClientUsers;
+            window.handleAdminLogin = handleAdminLogin;
+            window.handleClientLogin = handleClientLogin;
+        });
+    </script>
+</body>
+</html>
+
